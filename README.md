@@ -13,3 +13,8 @@ $ as chap3ex1.s -o exit.o
 $ ld exit.o -o exit
 ```
 
+## Do all and run
+```bash
+$ as chap3ex1.s -o object.o && ld object.o -o prog && ./prog
+```
+
