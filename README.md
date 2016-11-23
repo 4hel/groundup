@@ -1,6 +1,8 @@
 # Programming From The Ground Up
 
-Exercises for the [book](https://4hel.github.io/book/groundup.html)
+Exercises for the [book](https://4hel.github.io/book/groundup.html) on introduction to Programming using Linux Assembly Language.
+
+This is 32-bit assembler. It is not state of the art, but does the purpose of teaching how the machine works.
 
 ## Assemble the source to an object file
 
@@ -17,4 +19,13 @@ $ ld exit.o -o exit
 ```bash
 $ as chap3ex1.s -o object.o && ld object.o -o prog && ./prog
 ```
+
+## List of general purpose registers
+
+- %eax
+- %ebx
+- %ecx
+- %edx
+- %edi
+- %esi
 
