@@ -22,10 +22,10 @@ $ as chap3ex1.s -o object.o && ld object.o -o prog && ./prog
 
 ## List of general purpose registers
 
-- %eax
-- %ebx
-- %ecx
-- %edx
-- %edi
-- %esi
+- %eax (accumulator register)
+- %ebx (base register)
+- %ecx (counter register)
+- %edx (double word accumulator register)
+- %edi (destination index register)
+- %esi (source index register)
 
