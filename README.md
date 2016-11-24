@@ -7,17 +7,17 @@ This is 32-bit assembler. It is not state of the art, but does the purpose of te
 ## Assemble the source to an object file
 
 ```bash
-$ as chap3ex1.s -o exit.o
+$ as --32 chap3ex1.s -o exit.o
 ```
 
 ## Link the object file to an executable
 ```bash
-$ ld exit.o -o exit
+$ ld -m elf_i386 exit.o -o exit
 ```
 
 ## Do all and run
 ```bash
-$ as chap3ex1.s -o object.o && ld object.o -o prog && ./prog
+$ as --32 chap3ex1.s -o object.o && ld -m elf_i386 object.o -o prog && ./prog
 ```
 
 ## List of general purpose registers
