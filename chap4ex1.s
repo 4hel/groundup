@@ -27,7 +27,7 @@ exit_prog:
 	
 	.type power, @function
 power:					# BEGIN FUNCTION
-	pushl %ebx			# 1. save old base pointer
+	pushl %ebp			# 1. save old base pointer
 	movl %esp, %ebp			# 2. make stack pointer the base pointer
 					
 	movl 8(%ebp), %ebx		# move 1. Parameter to %eax
