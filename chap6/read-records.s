@@ -1,3 +1,5 @@
+	# PURPOSE: read records from test.dat and prit first names
+	#
 	.include "linux.s"
 	.include "record-def.s"
 
