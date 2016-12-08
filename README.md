@@ -20,12 +20,8 @@ $ ld -m elf_i386 exit.o -o exit
 $ as --32 chap3ex1.s -o object.o && ld -m elf_i386 object.o -o prog && ./prog
 ```
 
-## List of general purpose registers
-
-- %eax (accumulator register)
-- %ebx (base register)
-- %ecx (counter register)
-- %edx (double word accumulator register)
-- %edi (destination index register)
-- %esi (source index register)
-
+Program | Purpose
+--- | ---
+chap3ex1 | simply exit
+chap3ex2 | find max value
+chap4ex1 | function for power
