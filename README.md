@@ -1,8 +1,8 @@
 # Programming From The Ground Up
 
-Exercises for the [book](https://4hel.github.io/book/groundup.html) on introduction to Programming using Linux Assembly Language.
+This [book](https://4hel.github.io/book/groundup.html) teaches programming using Linux Assembly Language.
 
-This is 32-bit assembler. It is not state of the art, but does the purpose of teaching how the machine works.
+The Exercises are written in 32-bit x86 assembler. This is kind of obsolete but does the purpose of teaching how the machine works.
 
 ## Table of Exercises
 
