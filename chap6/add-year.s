@@ -51,7 +51,7 @@ loop_begin:
 	# returned the number of bytes read
 	# if it is not the same number as requested
 	# then  it is either an end-of-file or an error
-	compl $RECORD_SIZE, %eax
+	cmpl $RECORD_SIZE, %eax
 	jne loop_end
 
 	# increment age
