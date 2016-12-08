@@ -20,8 +20,13 @@ $ ld -m elf_i386 exit.o -o exit
 $ as --32 chap3ex1.s -o object.o && ld -m elf_i386 object.o -o prog && ./prog
 ```
 
+## Table of Exercises
+
 Program | Purpose
 --- | ---
 chap3ex1 | simply exit
 chap3ex2 | find max value
 chap4ex1 | function for power
+chap4ex2 | recursive factorial function
+chap5ex1 | toUpper function with file args
+chap6    | reading and writing records
