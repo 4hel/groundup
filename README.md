@@ -14,6 +14,8 @@ chap4ex1 | function for power
 chap4ex2 | recursive factorial function
 chap5ex1 | toUpper function with file args
 chap6    | reading and writing records
+chap7    | error handling for add-year
+
 
 ## Assemble the source to an object file
 
