@@ -16,6 +16,11 @@ chap5ex1 | toUpper function with file args
 chap6    | reading and writing records
 chap7    | error handling for add-year
 
+## Install 32 bit version libc
+
+```bash
+$ apt-get install libc6:i386 libc6-dev-i386
+```
 
 ## Assemble the source to an object file
 
