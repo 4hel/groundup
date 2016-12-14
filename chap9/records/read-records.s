@@ -7,9 +7,8 @@
 file_name:
 	.ascii "test.dat\0"
 
-	.section .bss
-	.lcomm record_buffer, RECORD_SIZE
-
+record_buffer_ptr:
+	.long 0
 
 	.section .text
 	.globl _start
@@ -20,6 +19,13 @@ _start:
 	movl %esp, %ebp				# copy stack pointer to %ebp
 	subl $8, %esp				# allocate space on the stack
 
+
+	call allocate_init
+
+	pushl $RECORD_SIZE
+	call allocate
+	movl %eax, record_buffer_ptr
+	
 	# open the file
 	movl $SYS_OPEN, %eax
 	movl $file_name, %ebx
@@ -35,7 +41,7 @@ _start:
 record_read_loop:
 	# read record from file
 	pushl ST_INPUT_DESCRIPTOR(%ebp)
-	pushl $record_buffer
+	pushl record_buffer_ptr
 	call read_record
 	addl $8, %esp
 
@@ -44,7 +50,13 @@ record_read_loop:
 	jne finished_reading
 
 	# find out size of first name
-	pushl $RECORD_FIRSTNAME + record_buffer
+
+
+	#
+	#  CHANGE
+	movl record_buffer_ptr, %eax
+	addl $RECORD_FIRSTNAME, %eax
+	pushl %eax
 	call count_chars
 	addl $4, %esp
 
@@ -52,7 +64,8 @@ record_read_loop:
 	movl %eax, %edx
 	movl $SYS_WRITE, %eax
 	movl ST_OUTPUT_DESCRIPTOR(%ebp), %ebx
-	movl $RECORD_FIRSTNAME + record_buffer, %ecx
+	movl record_buffer_ptr, %ecx
+	addl $RECORD_FIRSTNAME, %ecx
 	int $LINUX_SYSCALL
 
 	# print newline
@@ -62,6 +75,10 @@ record_read_loop:
 
 	jmp record_read_loop
 
+
+	pushl record_buffer_ptr
+	call deallocate
+	
 finished_reading:
 	movl $SYS_EXIT, %eax
 	movl $0, %ebx

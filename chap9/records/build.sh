@@ -1,3 +1,8 @@
+#!/bin/bash
+#
+# read-records is now using allocate and deallocate
+#
+
 mkdir target
 as --32 write-records.s -o ./target/write-records.o
 as --32 write-record.s -o  ./target/write-record.o
@@ -9,5 +14,5 @@ as --32 add-year.s -o      ./target/add-year.o
 as --32 error-exit.s -o    ./target/error-exit.o
 
 ld -m elf_i386 ./target/write-record.o ./target/write-records.o -o ./target/write-records
-ld -m elf_i386 ./target/read-record.o ./target/count-chars.o ./target/write-newline.o ./target/read-records.o -o ./target/read-records
+ld -m elf_i386 ./target/read-record.o ./target/count-chars.o ./target/write-newline.o ./target/read-records.o ../memory-1.0/alloc.o -o ./target/read-records
 ld -m elf_i386 ./target/write-record.o ./target/read-record.o ./target/count-chars.o ./target/write-newline.o ./target/error-exit.o ./target/add-year.o -o ./target/add-year
