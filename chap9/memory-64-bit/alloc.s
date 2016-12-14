@@ -9,6 +9,9 @@
 	
 ##### GLOBAL VARIABLES #####
 
+trace_string:
+	.ascii "syscall brk made"
+
 # beginning of the memory we are managing
 heap_begin:
 	.long 0
@@ -30,7 +33,9 @@ current_break:
 	.equ UNAVAILABLE, 0
 	.equ AVAILABLE, 1
 	.equ SYS_BRK, 45
+	.equ SYS_WRITE, 4
 	.equ LINUX_SYSCALL, 0x80
+	.equ STDOUT, 1
 
 
 	.section .text
@@ -86,10 +91,10 @@ allocate_init:
 	#             %rax - currently examined memory block
 	#             %rbx - current break position
 	#             %rdx - size of current memory region
-	.globl allocate
-	.type allocate, @function
+	.globl malloc
+	.type malloc, @function
 	.equ ST_MEM_SIZE, 16		# param position on stack
-allocate:
+malloc:
 	pushq %rbp			# start stack frame
 	movq %rsp, %rbp
 
@@ -162,6 +167,16 @@ move_break:
 	movq $SYS_BRK, %rax		# %rbx holds new break
 	int $LINUX_SYSCALL
 
+	#
+	# print trace
+	#
+	movq $SYS_WRITE, %rax
+	movq $STDOUT, %rbx
+	lea trace_string(%rip), %rcx
+	movq $16, %rdx
+	int $LINUX_SYSCALL
+	
+
 	cmpq $0, %rax			# check for error
 	je error
 
@@ -202,10 +217,10 @@ error:
 	# parameters:	1. address of memory block
 	#
 	# return value: none
-	.globl deallocate
-	.type deallocate, @function
+	.globl free
+	.type free, @function
 	.equ ST_MEMORY_SEG, 4
-deallocate:
+free:
 	movq ST_MEMORY_SEG(%rsp), %rax
 	subq $HEADER_SIZE, %rax
 	movq $AVAILABLE, HDR_AVAIL_OFFSET(%rax)
