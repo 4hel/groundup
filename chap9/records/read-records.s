@@ -20,11 +20,14 @@ _start:
 	subl $8, %esp				# allocate space on the stack
 
 
-	call allocate_init
-
+	#
+	# now using allocate 
+	#
 	pushl $RECORD_SIZE
 	call allocate
 	movl %eax, record_buffer_ptr
+
+
 	
 	# open the file
 	movl $SYS_OPEN, %eax

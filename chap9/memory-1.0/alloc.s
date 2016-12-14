@@ -84,6 +84,13 @@ allocate:
 	pushl %ebp			# start stack frame
 	movl %esp, %ebp
 
+	# check if already initialized
+	# if not call allocate_init
+	cmpl $0, current_break
+	jne setup_variables
+	call allocate_init
+
+setup_variables:	
 	movl ST_MEM_SIZE(%ebp), %ecx	# size param -> register
 	movl heap_begin, %eax
 	movl current_break, %ebx
