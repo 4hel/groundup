@@ -1,3 +1,3 @@
 #!/bin/bash
 
-as --32 alloc.s -o alloc.o
+as alloc.s -o alloc.o
