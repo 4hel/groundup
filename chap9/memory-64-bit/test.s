@@ -4,7 +4,7 @@
 	.globl _start
 _start:	
 	pushq $10
-	call malloc
+	call allocate_init
 	movl $SYS_EXIT, %eax
 	movl $0, %ebx
 	int $LINUX_SYSCALL
