@@ -1,0 +1,10 @@
+break *allocate
+break *allocate_init
+display $rax
+display $rbx
+display $rcx
+display $rdx
+display $rsp
+display current_break
+run
+

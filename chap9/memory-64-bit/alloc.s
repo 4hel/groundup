@@ -9,6 +9,9 @@
 	
 ##### GLOBAL VARIABLES #####
 
+trace_string:
+	.ascii "syscall brk made"
+	
 # beginning of the memory we are managing
 heap_begin:
 	.long 0
@@ -30,10 +33,21 @@ current_break:
 	.equ UNAVAILABLE, 0
 	.equ AVAILABLE, 1
 	.equ SYS_BRK, 45
+	.equ SYS_WRITE, 4
+	.equ SYS_EXIT, 1
+	.equ STDOUT, 1
 	.equ LINUX_SYSCALL, 0x80
 
 
 	.section .text
+	.globl _start
+_start:
+	movq %rsp, %rbp
+	pushq $10
+	callq allocate
+	movq $SYS_EXIT, %rax
+	movq $0, %rbx
+	int $LINUX_SYSCALL
 
 	##### FUNCTIONS #####
 
@@ -86,9 +100,10 @@ allocate:
 
 	# check if already initialized
 	# if not call allocate_init
-	cmpq $0, current_break
+	movq current_break, %rax
+	cmpq $0, %rax
 	jne setup_variables
-	call allocate_init
+	callq allocate_init
 
 setup_variables:	
 	movq ST_MEM_SIZE(%rbp), %rcx	# size param -> register
@@ -127,6 +142,15 @@ move_break:
 	pushq %rax			# save registers
 	pushq %rcx
 	pushq %rbx
+
+	#
+	# print trace
+	#
+	movq $SYS_WRITE, %rax
+	movq $STDOUT, %rbx
+	movq $trace_string, %rcx
+	movq $16, %rdx
+	int $LINUX_SYSCALL
 
 	movq $SYS_BRK, %rax		# %rbx holds new break
 	int $LINUX_SYSCALL
