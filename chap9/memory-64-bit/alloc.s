@@ -56,9 +56,19 @@ allocate_init:
 	int $LINUX_SYSCALL
 
 	incq %rax			# location after last valid addr
-	movq %rax, current_break	# currently the break, heap size=0
-	movq %rax, heap_begin		# first addr of heap
 
+	#
+	# the retval from SYS_BRK will be written position independently to
+	# 1. current_break
+	# 2. heap_begin
+	#
+	lea current_break(%rip), %rbx	# get pic addr of current_break into %rbx
+	movq %rax, (%rbx)		# write value to current_break
+
+	lea heap_begin(%rip), %rbx	# get pic addr of heap_begin into %rbx
+	movq %rax, (%rbx)		# write value to heap_begin
+
+	
 	movq %rbp, %rsp			# exit function
 	popq %rbp
 	ret
@@ -84,16 +94,29 @@ allocate:
 	pushq %rbp			# start stack frame
 	movq %rsp, %rbp
 
+
+	# load value of heap_begin into %rax position independently
+	lea heap_begin(%rip), %rdx
+	movq (%rdx), %rax
+	
 	# check if already initialized
 	# if not call allocate_init
-	cmpq $0, current_break
+	cmpq $0, %rax
 	jne setup_variables
 	call allocate_init
 
 setup_variables:	
 	movq ST_MEM_SIZE(%rbp), %rcx	# size param -> register
-	movq heap_begin, %rax
-	movq current_break, %rbx
+
+	
+	# load value of heap_begin into %rax position independently
+	lea heap_begin(%rip), %rdx
+	movq (%rdx), %rax
+
+	# load value of current_break into %rbx position independently
+	lea current_break(%rip), %rdx
+	movq (%rdx), %rbx
+	
 
 alloc_loop_begin:
 	cmpq %rbx, %rax			# if( heap_begin / current block  == current_break )
@@ -145,7 +168,14 @@ move_break:
 	addq $HEADER_SIZE, %rax		# move %rax to start of usable memory
 					# %rax is now retval
 
-	movq %rbx, current_break	# save new break
+
+	# save value of %rbx to current_break
+	lea current_break(%rip), %rdx	# get pic addr of current_break into %rdx
+	movq %rbx, (%rdx)		# write value to current_break
+
+
+
+	
 
 	movq %rbp, %rsp			# exit function
 	popq %rbp
