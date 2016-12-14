@@ -20,9 +20,9 @@ current_break:
 
 	##### STRUCTURE INFORMATION #####
 
-	.equ HEADER_SIZE, 8
+	.equ HEADER_SIZE, 16
 	.equ HDR_AVAIL_OFFSET, 0
-	.equ HDR_SIZE_OFFSET, 4
+	.equ HDR_SIZE_OFFSET, 8
 
 
 	##### CONSTANTS #####
@@ -46,21 +46,21 @@ current_break:
 	.globl allocate_init
 	.type allocate_init, @function
 allocate_init:
-	pushl %ebp			# start stack frame
-	movl %esp, %ebp			#
+	pushq %rbp			# start stack frame
+	movq %rsp, %rbp			#
 
 	# find out where the break is (call with 0)
 	# heap size still 0
-	movl $SYS_BRK, %eax
-	movl $0, %ebx
+	movq $SYS_BRK, %rax
+	movq $0, %rbx
 	int $LINUX_SYSCALL
 
-	incl %eax			# location after last valid addr
-	movl %eax, current_break	# currently the break, heap size=0
-	movl %eax, heap_begin		# first addr of heap
+	incq %rax			# location after last valid addr
+	movq %rax, current_break	# currently the break, heap size=0
+	movq %rax, heap_begin		# first addr of heap
 
-	movl %ebp, %esp			# exit function
-	popl %ebp
+	movq %rbp, %rsp			# exit function
+	popq %rbp
 	ret
 
 	# allocate:   grab a section of memory
@@ -69,92 +69,92 @@ allocate_init:
 	#
 	# parameters: 1. size of requested memory block
 	#
-	# ret value:  %eax -> address of the allocated memory
+	# ret value:  %rax -> address of the allocated memory
 	#
 	# variables used:
 	#
-	#             %ecx - size of requested memory block
-	#             %eax - currently examined memory block
-	#             %ebx - current break position
-	#             %edx - size of current memory region
+	#             %rcx - size of requested memory block
+	#             %rax - currently examined memory block
+	#             %rbx - current break position
+	#             %rdx - size of current memory region
 	.globl allocate
 	.type allocate, @function
 	.equ ST_MEM_SIZE, 8		# param position on stack
 allocate:
-	pushl %ebp			# start stack frame
-	movl %esp, %ebp
+	pushq %rbp			# start stack frame
+	movq %rsp, %rbp
 
 	# check if already initialized
 	# if not call allocate_init
-	cmpl $0, current_break
+	cmpq $0, current_break
 	jne setup_variables
 	call allocate_init
 
 setup_variables:	
-	movl ST_MEM_SIZE(%ebp), %ecx	# size param -> register
-	movl heap_begin, %eax
-	movl current_break, %ebx
+	movq ST_MEM_SIZE(%rbp), %rcx	# size param -> register
+	movq heap_begin, %rax
+	movq current_break, %rbx
 
 alloc_loop_begin:
-	cmpl %ebx, %eax			# if( heap_begin / current block  == current_break )
+	cmpq %rbx, %rax			# if( heap_begin / current block  == current_break )
 	je move_break			# then goto move_break
 
-	movl HDR_SIZE_OFFSET(%eax), %edx	# grab the size of curren block
-	cmpl $UNAVAILABLE, HDR_AVAIL_OFFSET	# if unavailable
+	movq HDR_SIZE_OFFSET(%rax), %rdx	# grab the size of curren block
+	cmpq $UNAVAILABLE, HDR_AVAIL_OFFSET	# if unavailable
 	je next_location			# then goto next_location
 
 double_check_cmp:	
-	cmpl %edx, %ecx			# if ( %ecx <= %edx )
+	cmpq %rdx, %rcx			# if ( %rcx <= %rdx )
 	jle allocate_here		# then goto allocate_here
 
 next_location:
-	addl $HEADER_SIZE, %eax		# %eax += HEADER_SIZE
-	addl %edx, %eax			# %eax += size of block
+	addq $HEADER_SIZE, %rax		# %rax += HEADER_SIZE
+	addq %rdx, %rax			# %rax += size of block
 	jmp alloc_loop_begin
 
 allocate_here:
-	movl $UNAVAILABLE, HDR_AVAIL_OFFSET(%eax)	# mark unavailable
-	addl $HEADER_SIZE, %eax				# move %eax past header for return
+	movq $UNAVAILABLE, HDR_AVAIL_OFFSET(%rax)	# mark unavailable
+	addq $HEADER_SIZE, %rax				# move %rax past header for return
 
-	movl %ebp, %esp			# exit function
-	popl %ebp
+	movq %rbp, %rsp			# exit function
+	popq %rbp
 	ret
 
 move_break:
-	addl $HEADER_SIZE, %ebx		# add header size to current break
-	addl %ecx, %ebx			# add requested size to current break
+	addq $HEADER_SIZE, %rbx		# add header size to current break
+	addq %rcx, %rbx			# add requested size to current break
 
-	pushl %eax			# save registers
-	pushl %ecx
-	pushl %ebx
+	pushq %rax			# save registers
+	pushq %rcx
+	pushq %rbx
 
-	movl $SYS_BRK, %eax		# %ebx holds new break
+	movq $SYS_BRK, %rax		# %rbx holds new break
 	int $LINUX_SYSCALL
 
-	cmpl $0, %eax			# check for error
+	cmpq $0, %rax			# check for error
 	je error
 
-	popl %ebx			# restore registers
-	popl %ecx
-	popl %eax
+	popq %rbx			# restore registers
+	popq %rcx
+	popq %rax
 
 	# write header fields
-	movl $UNAVAILABLE, HDR_AVAIL_OFFSET(%eax)
-	movl %ecx, HDR_SIZE_OFFSET(%eax)
+	movq $UNAVAILABLE, HDR_AVAIL_OFFSET(%rax)
+	movq %rcx, HDR_SIZE_OFFSET(%rax)
 
-	addl $HEADER_SIZE, %eax		# move %eax to start of usable memory
-					# %eax is now retval
+	addq $HEADER_SIZE, %rax		# move %rax to start of usable memory
+					# %rax is now retval
 
-	movl %ebx, current_break	# save new break
+	movq %rbx, current_break	# save new break
 
-	movl %ebp, %esp			# exit function
-	popl %ebp
+	movq %rbp, %rsp			# exit function
+	popq %rbp
 	ret
 
 error:
-	movl $0, %eax
-	movl %ebp, %esp			# exit function
-	popl %ebp
+	movq $0, %rax
+	movq %rbp, %rsp			# exit function
+	popq %rbp
 	ret
 ####### END OF FUNCTION #######
 
@@ -168,8 +168,8 @@ error:
 	.type deallocate, @function
 	.equ ST_MEMORY_SEG, 4
 deallocate:
-	movl ST_MEMORY_SEG(%esp), %eax
-	subl $HEADER_SIZE, %eax
-	movl $AVAILABLE, HDR_AVAIL_OFFSET(%eax)
+	movq ST_MEMORY_SEG(%rsp), %rax
+	subq $HEADER_SIZE, %rax
+	movq $AVAILABLE, HDR_AVAIL_OFFSET(%rax)
 	ret
 	
