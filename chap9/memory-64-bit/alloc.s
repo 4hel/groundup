@@ -43,7 +43,6 @@ current_break:
 	#
 	# parameters:    none
 	#
-	.globl allocate_init
 	.type allocate_init, @function
 allocate_init:
 	pushq %rbp			# start stack frame
@@ -89,7 +88,7 @@ allocate_init:
 	#             %rdx - size of current memory region
 	.globl allocate
 	.type allocate, @function
-	.equ ST_MEM_SIZE, 8		# param position on stack
+	.equ ST_MEM_SIZE, 16		# param position on stack
 allocate:
 	pushq %rbp			# start stack frame
 	movq %rsp, %rbp
@@ -103,8 +102,17 @@ allocate:
 	# if not call allocate_init
 	cmpq $0, %rax
 	jne setup_variables
-	call allocate_init
 
+
+
+	
+	#  call allocate_init
+	lea allocate_init(%rip), %rbx
+	call *(%rbx)
+	
+
+
+	
 setup_variables:	
 	movq ST_MEM_SIZE(%rbp), %rcx	# size param -> register
 
