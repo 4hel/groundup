@@ -5,7 +5,7 @@
 	.globl _start
 _start:
 	movq %rsp, %rbp
-	pushq $10
+	movq $10, %rdi
 	callq allocate
 	movq $SYS_EXIT, %rax
 	movq $0, %rbx

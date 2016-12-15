@@ -86,7 +86,6 @@ allocate_init:
 	#             %rdx - size of current memory region
 	.globl allocate
 	.type allocate, @function
-	.equ ST_MEM_SIZE, 16		# param position on stack
 allocate:
 	pushq %rbp			# start stack frame
 	movq %rsp, %rbp
@@ -99,7 +98,7 @@ allocate:
 	callq allocate_init
 
 setup_variables:	
-	movq ST_MEM_SIZE(%rbp), %rcx	# size param -> register
+	movq %rdi, %rcx			# size param -> %rcx register
 	movq heap_begin, %rax
 	movq current_break, %rbx
 
@@ -186,9 +185,8 @@ error:
 	# return value: none
 	.globl deallocate
 	.type deallocate, @function
-	.equ ST_MEMORY_SEG, 8
 deallocate:
-	movq ST_MEMORY_SEG(%rsp), %rax
+	movq %rdi, %rax			# param passed via %rdi
 	subq $HEADER_SIZE, %rax
 	movq $AVAILABLE, HDR_AVAIL_OFFSET(%rax)
 	ret
