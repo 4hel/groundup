@@ -10,7 +10,7 @@
 ##### GLOBAL VARIABLES #####
 
 trace_string:
-	.ascii "syscall brk made"
+	.ascii "syscall brk 4444"
 	
 # beginning of the memory we are managing
 heap_begin:
@@ -50,21 +50,12 @@ current_break:
 	#
 	# parameters:    none
 	#
-	.globl allocate_init
 	.type allocate_init, @function
 allocate_init:
 	pushq %rbp			# start stack frame
 	movq %rsp, %rbp			#
 
-	# find out where the break is (call with 0)
-	# heap size still 0
-	movq $SYS_BRK, %rax
-	movq $0, %rbx
-	int $LINUX_SYSCALL
 
-	incq %rax			# location after last valid addr
-	movq %rax, current_break	# currently the break, heap size=0
-	movq %rax, heap_begin		# first addr of heap
 
 	movq %rbp, %rsp			# exit function
 	popq %rbp
@@ -92,15 +83,28 @@ malloc:
 
 	# check if already initialized
 	# if not call allocate_init
-	movq current_break, %rax
+	movq current_break(%rip), %rax
 	cmpq $0, %rax
 	jne setup_variables
-	callq allocate_init
+
+	# allocate init section
+	#
+	# find out where the break is (call with 0)
+	# heap size still 0
+	movq $SYS_BRK, %rax
+	movq $0, %rbx
+	int $LINUX_SYSCALL
+
+	incq %rax			# location after last valid addr
+	movq %rax, current_break(%rip)	# currently the break, heap size=0
+	movq %rax, heap_begin(%rip)	# first addr of heap
+	
+
 
 setup_variables:	
 	movq %rdi, %rcx			# size param -> %rcx register
-	movq heap_begin, %rax
-	movq current_break, %rbx
+	movq heap_begin(%rip), %rax
+	movq current_break(%rip), %rbx
 
 alloc_loop_begin:
 	cmpq %rbx, %rax			# if( heap_begin / current block  == current_break )
@@ -140,7 +144,7 @@ move_break:
 	#
 	movq $SYS_WRITE, %rax
 	movq $STDOUT, %rbx
-	movq $trace_string, %rcx
+	lea trace_string(%rip), %rcx
 	movq $16, %rdx
 	int $LINUX_SYSCALL
 
@@ -164,7 +168,7 @@ move_break:
 	addq $HEADER_SIZE, %rax		# move %rax to start of usable memory
 					# %rax is now retval
 
-	movq %rbx, current_break	# save new break
+	movq %rbx, current_break(%rip)	# save new break
 
 	movq %rbp, %rsp			# exit function
 	popq %rbp
