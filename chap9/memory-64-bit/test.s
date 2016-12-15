@@ -5,8 +5,18 @@
 	.globl _start
 _start:
 	movq %rsp, %rbp
-	movq $10, %rdi
+
+	# allocate 8 byte
+	movq $8, %rdi
 	callq allocate
+
+	# write 255 to allocated memory
+	movq $255, (%rax)
+
+	# deallocate
+	movq %rax, %rdi
+	call deallocate
+	
 	movq $SYS_EXIT, %rax
 	movq $0, %rbx
 	int $LINUX_SYSCALL
