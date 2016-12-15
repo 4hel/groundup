@@ -14,11 +14,11 @@ trace_string:
 	
 # beginning of the memory we are managing
 heap_begin:
-	.long 0
+	.quad 0
 
 # one location past the memory we are managing
 current_break:
-	.long 0
+	.quad 0
 	
 
 	##### STRUCTURE INFORMATION #####
@@ -40,14 +40,7 @@ current_break:
 
 
 	.section .text
-	.globl _start
-_start:
-	movq %rsp, %rbp
-	pushq $10
-	callq allocate
-	movq $SYS_EXIT, %rax
-	movq $0, %rbx
-	int $LINUX_SYSCALL
+
 
 	##### FUNCTIONS #####
 
@@ -152,6 +145,9 @@ move_break:
 	movq $16, %rdx
 	int $LINUX_SYSCALL
 
+	popq %rbx
+	pushq %rbx
+	
 	movq $SYS_BRK, %rax		# %rbx holds new break
 	int $LINUX_SYSCALL
 
