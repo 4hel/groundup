@@ -8,14 +8,14 @@ _start:
 
 	# allocate 8 byte
 	movq $8, %rdi
-	callq allocate
+	callq malloc
 
 	# write 255 to allocated memory
 	movq $255, (%rax)
 
 	# deallocate
 	movq %rax, %rdi
-	call deallocate
+	call free
 	
 	movq $SYS_EXIT, %rax
 	movq $0, %rbx

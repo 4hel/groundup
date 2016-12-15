@@ -84,9 +84,9 @@ allocate_init:
 	#             %rax - currently examined memory block
 	#             %rbx - current break position
 	#             %rdx - size of current memory region
-	.globl allocate
-	.type allocate, @function
-allocate:
+	.globl malloc
+	.type malloc, @function
+malloc:
 	pushq %rbp			# start stack frame
 	movq %rsp, %rbp
 
@@ -183,9 +183,9 @@ error:
 	# parameters:	1. address of memory block
 	#
 	# return value: none
-	.globl deallocate
-	.type deallocate, @function
-deallocate:
+	.globl free
+	.type free, @function
+free:
 	movq %rdi, %rax			# param passed via %rdi
 	subq $HEADER_SIZE, %rax
 	movq $AVAILABLE, HDR_AVAIL_OFFSET(%rax)
