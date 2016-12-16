@@ -6,17 +6,20 @@ The Exercises are written in 32-bit x86 assembler. This is kind of obsolete but 
 
 ## Table of Exercises
 
-Program | Purpose
---- | ---
-chap3ex1        | simply exit
-chap3ex2        | find max value
-chap4ex1        | function for power
-chap4ex2        | recursive factorial function
-chap5ex1        | toUpper function with file args
-chap6           | reading and writing records
-chap7           | error handling for add-year
-chap8/hello     | hello world linking libc.so
-chap8/librecord | creating a dynamic library
+Program             | Purpose
+---                 | ---
+chap3ex1            | exit system call
+chap3ex2            | find max value
+chap4ex1            | function for power
+chap4ex2            | recursive factorial function
+chap5ex1            | toUpper function with file args
+chap6               | reading and writing records
+chap7               | records with error handling for add-year
+chap8/hello         | hello world linking libc.so
+chap8/librecord     | creating a dynamic library
+chap9/memory-1.0    | memory manager like malloc
+chap9/memory-64-bit | 64-bit malloc and free
+chap9/records       | read-records using memory manager
 
 ## Install 32 bit version libc
 
